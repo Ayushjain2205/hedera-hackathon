@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
+import { RegistrationFormValues } from "../registration-form";
 import {
   FormField,
   FormItem,
@@ -10,7 +11,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-export function ApiVerificationStep({ form }) {
+interface ApiVerificationStepProps {
+  form: UseFormReturn<RegistrationFormValues>;
+}
+
+export function ApiVerificationStep({ form }: ApiVerificationStepProps) {
   return (
     <div className="space-y-6">
       <FormField

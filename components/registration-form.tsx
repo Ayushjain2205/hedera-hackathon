@@ -45,7 +45,7 @@ const formSchema = z.object({
   }),
 });
 
-type RegistrationFormValues = z.infer<typeof formSchema>;
+export type RegistrationFormValues = z.infer<typeof formSchema>;
 
 const steps = [
   { title: "Basic Information", description: "Agent details and capabilities" },
@@ -62,6 +62,7 @@ export function RegistrationForm() {
 
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(formSchema),
+    mode: "onSubmit",
     defaultValues: {
       basicInfo: {
         name: "",
@@ -91,24 +92,27 @@ export function RegistrationForm() {
     },
   });
 
-  function onSubmit(data: RegistrationFormValues) {
+  // Separate function for handling next step
+  const handleNextStep = () => {
+    console.log("Handling next step, current step:", currentStep);
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else {
-      console.log(data);
-      // Here you would typically send the data to your backend
     }
-  }
+  };
+
+  // Separate function for handling previous step
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   return (
     <Card className="max-w-4xl mx-auto">
       <CardContent className="pt-6">
         <Steps currentStep={currentStep} steps={steps} />
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 mt-8"
-          >
+          <form className="space-y-8 mt-8">
             {currentStep === 0 && <BasicInfoStep form={form} />}
             {currentStep === 1 && <TechnicalConfigStep form={form} />}
             {currentStep === 2 && <ApiVerificationStep form={form} />}
@@ -118,12 +122,12 @@ export function RegistrationForm() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setCurrentStep(currentStep - 1)}
+                  onClick={handlePreviousStep}
                 >
                   Previous
                 </Button>
               )}
-              <Button type="submit">
+              <Button type="button" onClick={handleNextStep}>
                 {currentStep === steps.length - 1 ? "Submit" : "Next"}
               </Button>
             </div>

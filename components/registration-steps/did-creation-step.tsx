@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
+import { RegistrationFormValues } from "../registration-form";
 import {
   FormField,
   FormItem,
@@ -10,7 +11,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export function DidCreationStep({ form }) {
+interface DidCreationStepProps {
+  form: UseFormReturn<RegistrationFormValues>;
+}
+
+export function DidCreationStep({ form }: DidCreationStepProps) {
   return (
     <div className="space-y-6">
       <FormField

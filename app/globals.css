@@ -18,7 +18,9 @@ body {
   }
 }
 
-/* Add these styles to your existing global CSS file */
+/* Existing styles... */
+
+/* Updated and new styles for selected options */
 .react-select-container .react-select__control {
   border-radius: 0.375rem;
   border-color: hsl(var(--input));
@@ -56,11 +58,21 @@ body {
 }
 
 .react-select-container .react-select__multi-value {
-  background-color: hsl(var(--accent));
+  background-color: hsl(var(--primary));
+  border-radius: 0.25rem;
+  margin: 2px;
 }
 
 .react-select-container .react-select__multi-value__label {
-  color: hsl(var(--accent-foreground));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.875rem;
+  padding: 2px 6px;
+}
+
+.react-select-container .react-select__multi-value__remove {
+  color: hsl(var(--primary-foreground));
+  cursor: pointer;
+  border-radius: 0 0.25rem 0.25rem 0;
 }
 
 .react-select-container .react-select__multi-value__remove:hover {
@@ -74,4 +86,41 @@ body {
 
 .react-select-container .react-select__menu-list {
   background-color: white;
+  padding: 0;
+}
+
+.react-select-container .react-select__group-heading {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  padding: 8px 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Add a subtle hover effect to options */
+.react-select-container .react-select__option:hover {
+  background-color: hsl(var(--accent));
+  cursor: pointer;
+}
+
+/* Style for the placeholder */
+.react-select-container .react-select__placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Style for the dropdown indicator */
+.react-select-container .react-select__dropdown-indicator {
+  color: hsl(var(--muted-foreground));
+}
+
+.react-select-container .react-select__dropdown-indicator:hover {
+  color: hsl(var(--foreground));
+}
+
+/* Add a transition effect for smooth interactions */
+.react-select-container .react-select__control,
+.react-select-container .react-select__option,
+.react-select-container .react-select__multi-value,
+.react-select-container .react-select__multi-value__remove {
+  transition: all 0.2s ease;
 }

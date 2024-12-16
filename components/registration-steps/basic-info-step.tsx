@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import Select from "react-select";
+import { RegistrationFormValues } from "../registration-form";
 
 const capabilities = {
   text: ["Text Generation", "Content Summarization", "Language Translation"],
@@ -27,7 +28,11 @@ const capabilityOptions = Object.entries(capabilities).flatMap(
     items.map((item) => ({ value: item, label: item, group: category }))
 );
 
-export function BasicInfoStep({ form }) {
+interface BasicInfoStepProps {
+  form: UseFormReturn<RegistrationFormValues>;
+}
+
+export function BasicInfoStep({ form }: BasicInfoStepProps) {
   return (
     <div className="space-y-6">
       <FormField

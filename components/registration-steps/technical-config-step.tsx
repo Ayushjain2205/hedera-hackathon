@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
+import { RegistrationFormValues } from "../registration-form";
 import {
   FormField,
   FormItem,
@@ -16,7 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function TechnicalConfigStep({ form }) {
+interface TechnicalConfigStepProps {
+  form: UseFormReturn<RegistrationFormValues>;
+}
+
+export function TechnicalConfigStep({ form }: TechnicalConfigStepProps) {
   return (
     <div className="space-y-6">
       <FormField
