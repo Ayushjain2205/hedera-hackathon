@@ -4,256 +4,132 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
+import { BasicInfoStep } from "./registration-steps/basic-info-step";
+import { TechnicalConfigStep } from "./registration-steps/technical-config-step";
+import { ApiVerificationStep } from "./registration-steps/api-verification-step";
+import { DidCreationStep } from "./registration-steps/did-creation-step";
+import { Steps } from "./steps";
 
 const formSchema = z.object({
-  agentName: z.string().min(3).max(50),
-  apiEndpoint: z.string().url(),
-  publicKey: z.string().min(10),
-  controllerWallet: z.string().min(42).max(42),
-  capabilities: z.array(z.string()).min(1),
-  cpuLimit: z.number().min(1),
-  memoryLimit: z.number().min(1),
-  storageLimit: z.number().min(1),
+  basicInfo: z.object({
+    name: z
+      .string()
+      .min(3)
+      .max(30)
+      .regex(/^[a-zA-Z0-9-]+$/),
+    wallet: z.string(),
+    description: z.string().max(500),
+    capabilities: z.array(z.string()).min(1).max(10),
+  }),
+  technical: z.object({
+    endpoint: z.string().url(),
+    auth: z.object({
+      type: z.enum(["apiKey", "bearer", "oauth"]),
+      config: z.any(),
+    }),
+    rateLimit: z.number().min(1),
+    timeout: z.number().min(1000).max(60000),
+  }),
+  verification: z.object({
+    testConfig: z.any(),
+    testResult: z.any(),
+    openApiSpec: z.any(),
+  }),
+  did: z.object({
+    identifier: z.string(),
+    status: z.enum(["pending", "created"]),
+    timestamp: z.string(),
+  }),
 });
 
-export function RegistrationForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+type RegistrationFormValues = z.infer<typeof formSchema>;
 
-  const form = useForm<z.infer<typeof formSchema>>({
+const steps = [
+  { title: "Basic Information", description: "Agent details and capabilities" },
+  {
+    title: "Technical Configuration",
+    description: "API and authentication setup",
+  },
+  { title: "API Verification", description: "Test and validate API" },
+  { title: "DID Creation", description: "Review and create DID" },
+];
+
+export function RegistrationForm() {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      agentName: "",
-      apiEndpoint: "",
-      publicKey: "",
-      controllerWallet: "",
-      capabilities: [],
-      cpuLimit: 1,
-      memoryLimit: 1,
-      storageLimit: 1,
+      basicInfo: {
+        name: "",
+        wallet: "",
+        description: "",
+        capabilities: [],
+      },
+      technical: {
+        endpoint: "",
+        auth: {
+          type: "apiKey",
+          config: {},
+        },
+        rateLimit: 60,
+        timeout: 30000,
+      },
+      verification: {
+        testConfig: {},
+        testResult: null,
+        openApiSpec: null,
+      },
+      did: {
+        identifier: "",
+        status: "pending",
+        timestamp: "",
+      },
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values);
-      setIsSubmitting(false);
-    }, 2000);
+  function onSubmit(data: RegistrationFormValues) {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      console.log(data);
+      // Here you would typically send the data to your backend
+    }
   }
 
   return (
-    <Form {...form}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 bg-white bg-opacity-50 backdrop-filter backdrop-blur-lg p-8 rounded-lg shadow-lg max-w-2xl mx-auto border border-neutral-200 border-gray-200 dark:border-neutral-800"
-        >
-          <FormField
-            control={form.control}
-            name="agentName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Agent Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="myagent.agent"
-                    {...field}
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </FormControl>
-                <FormDescription className="text-gray-600">
-                  This will be your agent's unique identifier.
-                </FormDescription>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="apiEndpoint"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>API Endpoint URL</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="https://api.myagent.com"
-                    {...field}
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="publicKey"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Public Key</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your public key"
-                    {...field}
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="controllerWallet"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Controller Wallet Address</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="0x..."
-                    {...field}
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="capabilities"
-            render={() => (
-              <FormItem>
-                <FormLabel>Basic Capabilities</FormLabel>
-                <div className="space-y-2">
-                  {[
-                    "Text Generation",
-                    "Image Recognition",
-                    "Data Analysis",
-                    "Language Translation",
-                  ].map((capability) => (
-                    <FormField
-                      key={capability}
-                      control={form.control}
-                      name="capabilities"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={capability}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(capability)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([
-                                        ...field.value,
-                                        capability,
-                                      ])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== capability
-                                        )
-                                      );
-                                }}
-                                className="border-gray-300"
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal text-gray-700">
-                              {capability}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="cpuLimit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>CPU Limit (cores)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="memoryLimit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Memory Limit (GB)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="storageLimit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Storage Limit (GB)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white transition-all duration-300"
+    <Card className="max-w-4xl mx-auto">
+      <CardContent className="pt-6">
+        <Steps currentStep={currentStep} steps={steps} />
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 mt-8"
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </Button>
-        </form>
-      </motion.div>
-    </Form>
+            {currentStep === 0 && <BasicInfoStep form={form} />}
+            {currentStep === 1 && <TechnicalConfigStep form={form} />}
+            {currentStep === 2 && <ApiVerificationStep form={form} />}
+            {currentStep === 3 && <DidCreationStep form={form} />}
+            <div className="flex justify-between">
+              {currentStep > 0 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                >
+                  Previous
+                </Button>
+              )}
+              <Button type="submit">
+                {currentStep === steps.length - 1 ? "Submit" : "Next"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
