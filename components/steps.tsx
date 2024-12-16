@@ -13,13 +13,13 @@ interface StepsProps {
 export function Steps({ steps, currentStep }: StepsProps) {
   return (
     <div className="relative">
-      <div className="absolute left-0 top-2 h-0.5 w-full bg-gray-200">
+      <div className="absolute left-0 top-4 h-0.5 w-full bg-gray-200">
         <div
           className="absolute h-0.5 bg-blue-500 transition-all duration-500 ease-in-out"
           style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
         ></div>
       </div>
-      <ul className="relative flex justify-between">
+      <ul className="relative flex justify-between px-2">
         {steps.map((step, index) => (
           <li key={step.title} className="flex flex-col items-center">
             <div
@@ -35,11 +35,8 @@ export function Steps({ steps, currentStep }: StepsProps) {
                 <span>{index + 1}</span>
               )}
             </div>
-            <div className="mt-2 text-center">
-              <div className="text-sm font-medium">{step.title}</div>
-              <div className="mt-1 text-xs text-gray-500">
-                {step.description}
-              </div>
+            <div className="mt-3 text-center w-20">
+              <div className="text-xs font-medium">{step.title}</div>
             </div>
           </li>
         ))}
