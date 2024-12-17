@@ -14,6 +14,7 @@ const mockTaskData = {
   taskId: "TASK-001",
   timestamp: "2023-06-20T14:30:00Z",
   runBy: "User123",
+  agentName: "Agent001",
   task: "Text Generation",
   verified: true,
   input: {
@@ -38,23 +39,18 @@ export default function TaskDetailPage() {
 
   useEffect(() => {
     // In a real application, you would fetch the task data here
-    // based on the agentId and taskId from the URL params
-    console.log(
-      "Fetching task with ID:",
-      params.taskId,
-      "for agent:",
-      params.id
-    );
+    // based on the taskId from the URL params
+    console.log("Fetching task with ID:", params.taskId);
     // For now, we're using mock data
     setTask(mockTaskData);
-  }, [params.id, params.taskId]);
+  }, [params.taskId]);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="container mx-auto py-10 px-4">
         <Button variant="ghost" className="mb-6" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Agent
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
 
         <Card className="w-full max-w-3xl mx-auto overflow-hidden mb-8">
@@ -81,6 +77,10 @@ export default function TaskDetailPage() {
               <div>
                 <p className="text-sm font-medium text-gray-500">Run By</p>
                 <p className="text-sm">{task.runBy}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Agent</p>
+                <p className="text-sm">{task.agentName}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Task Type</p>

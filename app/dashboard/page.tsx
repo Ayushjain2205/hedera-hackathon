@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for agents (same as before)
+// Mock data for agents
 const agents = [
   { id: 1, name: "Agent001", status: "Active", score: 95, tasks: 150 },
   { id: 2, name: "AIAssistant", status: "Inactive", score: 88, tasks: 120 },
@@ -26,11 +26,23 @@ const agents = [
   { id: 5, name: "ImageAI", status: "Pending", score: 85, tasks: 100 },
 ];
 
+// Mock data for recent tasks
+const recentTasks = [
+  { id: "TASK-001", type: "Text Generation", timestamp: "2 mins ago" },
+  { id: "TASK-002", type: "Data Analysis", timestamp: "5 mins ago" },
+  { id: "TASK-003", type: "Image Recognition", timestamp: "10 mins ago" },
+  { id: "TASK-004", type: "Language Translation", timestamp: "15 mins ago" },
+];
+
 export default function DashboardPage() {
   const router = useRouter();
 
   const handleAgentClick = (agentId: number) => {
     router.push(`/agent/${agentId}`);
+  };
+
+  const handleTaskClick = (taskId: string) => {
+    router.push(`/task/${taskId}`);
   };
 
   return (
@@ -63,15 +75,19 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="flex items-center justify-between">
+                  {recentTasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded"
+                      onClick={() => handleTaskClick(task.id)}
+                    >
                       <div className="flex items-center space-x-4">
                         <div className="font-mono text-sm text-gray-500">
-                          TASK-00{i}
+                          {task.id}
                         </div>
-                        <div className="text-sm">Text Generation</div>
+                        <div className="text-sm">{task.type}</div>
                       </div>
-                      <Badge variant="outline">2 mins ago</Badge>
+                      <Badge variant="outline">{task.timestamp}</Badge>
                     </div>
                   ))}
                 </div>

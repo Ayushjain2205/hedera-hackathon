@@ -15,7 +15,7 @@ export function SearchBar() {
 
     // If query matches task ID pattern (TASK-XXX)
     if (/^TASK-\d{3}$/.test(query)) {
-      router.push(`/agent/1/task/${query}`); // We're using a dummy agent ID here
+      router.push(`/task/${query}`);
     }
     // If query looks like an agent name
     else {
