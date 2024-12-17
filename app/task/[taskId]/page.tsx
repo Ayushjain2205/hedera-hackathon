@@ -109,7 +109,7 @@ export default function TaskDetailPage() {
                 text={JSON.stringify(task.input, null, 2)}
                 language="json"
                 theme={dracula}
-                wrapLines
+                wrapLongLines
               />
             </div>
 

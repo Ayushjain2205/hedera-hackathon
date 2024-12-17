@@ -125,10 +125,10 @@ export default function DashboardPage() {
                         <Badge
                           variant={
                             agent.status === "Active"
-                              ? "success"
+                              ? "active"
                               : agent.status === "Inactive"
-                              ? "destructive"
-                              : "default"
+                              ? "inactive"
+                              : "pending"
                           }
                         >
                           {agent.status}
