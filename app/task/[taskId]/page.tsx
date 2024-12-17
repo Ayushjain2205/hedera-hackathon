@@ -92,13 +92,16 @@ export default function TaskDetailPage() {
                 </p>
                 <div className="flex items-center">
                   {task.verified ? (
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    <Badge variant="active" className="flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Verified
+                    </Badge>
                   ) : (
-                    <XCircle className="h-5 w-5 text-red-500 mr-2" />
+                    <Badge variant="inactive" className="flex items-center">
+                      <XCircle className="h-4 w-4 mr-1" />
+                      Not Verified
+                    </Badge>
                   )}
-                  <span className="text-sm">
-                    {task.verified ? "Verified" : "Not Verified"}
-                  </span>
                 </div>
               </div>
             </div>
@@ -109,7 +112,7 @@ export default function TaskDetailPage() {
                 text={JSON.stringify(task.input, null, 2)}
                 language="json"
                 theme={dracula}
-                wrapLongLines
+                wrapLongLines={true}
               />
             </div>
 

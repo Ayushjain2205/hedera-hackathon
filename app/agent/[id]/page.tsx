@@ -155,7 +155,7 @@ export default function AgentPage() {
   }, [params.id]);
 
   const handleViewTask = (taskId: string) => {
-    router.push(`/agent/${params.id}/task/${taskId}`);
+    router.push(`/task/${taskId}`);
   };
 
   return (
@@ -197,7 +197,11 @@ export default function AgentPage() {
                   <p className="text-sm font-medium text-gray-500">Status</p>
                   <Badge
                     variant={
-                      agent.status === "Active" ? "success" : "secondary"
+                      agent.status === "Active"
+                        ? "active"
+                        : agent.status === "Inactive"
+                        ? "inactive"
+                        : "pending"
                     }
                   >
                     {agent.status}
@@ -216,7 +220,7 @@ export default function AgentPage() {
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {agent.capabilities.map((capability, index) => (
-                    <Badge key={index} variant="outline">
+                    <Badge key={index} variant="default">
                       {capability}
                     </Badge>
                   ))}
