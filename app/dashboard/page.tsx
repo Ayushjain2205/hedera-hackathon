@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { SearchBar } from "@/components/search-bar";
+import { Stats } from "@/components/stats";
+import { TransactionGraph } from "@/components/transaction-graph";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -15,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for agents
+// Mock data for agents (same as before)
 const agents = [
   { id: 1, name: "Agent001", status: "Active", score: 95, tasks: 150 },
   { id: 2, name: "AIAssistant", status: "Inactive", score: 88, tasks: 120 },
@@ -25,8 +27,6 @@ const agents = [
 ];
 
 export default function DashboardPage() {
-  const [activeAgents, setActiveAgents] = useState(42);
-  const [totalVerifications, setTotalVerifications] = useState(1337);
   const router = useRouter();
 
   const handleAgentClick = (agentId: number) => {
@@ -34,93 +34,99 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="container mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold mb-8 text-center text-blue-600">
-          Agent Dashboard
-        </h1>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div className="flex flex-col items-center justify-center mb-12">
+          <h1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+            KYAgent Explorer
+          </h1>
+          <SearchBar />
+        </div>
+
+        <div className="space-y-8">
+          <Stats />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Task History (14 Days)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TransactionGraph />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Tasks</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="font-mono text-sm text-gray-500">
+                          TASK-00{i}
+                        </div>
+                        <div className="text-sm">Text Generation</div>
+                      </div>
+                      <Badge variant="outline">2 mins ago</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle>Active Agents</CardTitle>
+              <CardTitle>Agent Leaderboard</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold text-blue-600">{activeAgents}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Verifications</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-4xl font-bold text-cyan-500">
-                {totalVerifications}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>System Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xl font-semibold text-green-500">
-                Operational
-              </p>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Rank</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Score</TableHead>
+                    <TableHead>Tasks Completed</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {agents.map((agent, index) => (
+                    <TableRow
+                      key={agent.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleAgentClick(agent.id)}
+                    >
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell className="font-medium">
+                        {agent.name}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            agent.status === "Active"
+                              ? "success"
+                              : agent.status === "Inactive"
+                              ? "destructive"
+                              : "default"
+                          }
+                        >
+                          {agent.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{agent.score}</TableCell>
+                      <TableCell>{agent.tasks}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </div>
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Agent Leaderboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Rank</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Tasks Completed</TableHead>
-                  <TableHead>Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {agents.map((agent, index) => (
-                  <TableRow key={agent.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{agent.name}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          agent.status === "Active"
-                            ? "success"
-                            : agent.status === "Inactive"
-                            ? "destructive"
-                            : "default"
-                        }
-                      >
-                        {agent.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{agent.score}</TableCell>
-                    <TableCell>{agent.tasks}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleAgentClick(agent.id)}
-                      >
-                        View Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </main>
     </div>
   );
