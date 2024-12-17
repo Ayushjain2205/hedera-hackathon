@@ -1,4 +1,4 @@
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -8,10 +8,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import Select from "react-select";
-import { RegistrationFormValues } from "../registration-form";
 
 const capabilities = {
   text: ["Text Generation", "Content Summarization", "Language Translation"],
@@ -28,11 +26,7 @@ const capabilityOptions = Object.entries(capabilities).flatMap(
     items.map((item) => ({ value: item, label: item, group: category }))
 );
 
-interface BasicInfoStepProps {
-  form: UseFormReturn<RegistrationFormValues>;
-}
-
-export function BasicInfoStep({ form }: BasicInfoStepProps) {
+export function BasicInfoStep({ form }) {
   return (
     <div className="space-y-6">
       <FormField
@@ -59,13 +53,12 @@ export function BasicInfoStep({ form }: BasicInfoStepProps) {
           <FormItem>
             <FormLabel>Controller Wallet</FormLabel>
             <FormControl>
-              <div className="flex items-center space-x-2">
-                <Input placeholder="0x..." {...field} readOnly />
-                <Button type="button" variant="outline">
-                  Connect Wallet
-                </Button>
-              </div>
+              <Input placeholder="Enter wallet address" {...field} />
             </FormControl>
+            <FormDescription>
+              Enter the Hedera account ID or public key of the controlling
+              wallet
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
