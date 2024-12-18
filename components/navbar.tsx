@@ -4,18 +4,36 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { client } from "@/lib/client";
-import { ConnectButton } from "thirdweb/react";
-import { mantleSepolia } from "thirdweb/chains";
+import { useState, useEffect } from "react";
+import { HashConnect } from "hashconnect";
+
+// Initialize HashConnect
+const hashConnect = new HashConnect();
 
 export function Navbar() {
   const pathname = usePathname();
+  const [walletData, setWalletData] = useState<any>(null);
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/register", label: "Register" },
     { href: "/docs", label: "Docs" },
   ];
+
+  const connectWallet = async () => {
+    const appMetadata = {
+      name: "KYAgent",
+      description: "A Trust System for AI Agents",
+      icon: "https://your-website.com/icon.png",
+    };
+
+    const initData = await hashConnect.init(appMetadata);
+    await hashConnect.connectToLocalWallet();
+
+    hashConnect.pairingEvent.once((pairingData) => {
+      setWalletData(pairingData);
+    });
+  };
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -38,7 +56,12 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
-          <ConnectButton client={client} chain={mantleSepolia} theme="light" />
+          <Button
+            onClick={connectWallet}
+            className="bg-blue-600 text-white hover:bg-blue-700"
+          >
+            {walletData ? "Connected" : "Connect Wallet"}
+          </Button>
         </div>
       </div>
     </nav>

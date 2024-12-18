@@ -3,86 +3,86 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "./AgentRegistry.sol";
 
 contract TaskManager is Ownable, ReentrancyGuard {
-    using Counters for Counters.Counter;
-
     struct Task {
         uint256 agentId;
-        address requester;
-        string input;
-        string output;
-        bool isVerified;
-        uint256 timestamp;
+        string description;
         TaskStatus status;
+        uint256 startTime;
+        uint256 completionTime;
+        bytes result;
     }
 
     enum TaskStatus {
-        Pending,
+        Created,
+        InProgress,
         Completed,
         Failed
     }
 
-    Counters.Counter private _taskIds;
     mapping(uint256 => Task) public tasks;
-    mapping(uint256 => uint256[]) public agentTasks;
-
-    IKYAgentRegistry public registry;
+    uint256 private taskCounter;
+    IKYAgentRegistry public agentRegistry;
 
     event TaskCreated(uint256 indexed taskId, uint256 indexed agentId);
-    event TaskCompleted(uint256 indexed taskId);
+    event TaskCompleted(uint256 indexed taskId, bytes result);
     event TaskFailed(uint256 indexed taskId);
-    event TaskVerified(uint256 indexed taskId);
 
-    constructor(address _registry) Ownable(msg.sender) {
-        registry = IKYAgentRegistry(_registry);
+    constructor(address _agentRegistry) Ownable(msg.sender) {
+        agentRegistry = IKYAgentRegistry(_agentRegistry);
     }
 
     function createTask(
         uint256 agentId,
-        string memory input
+        string memory description
     ) external nonReentrant returns (uint256) {
-        require(registry.isAgentVerified(agentId), "Agent not verified");
+        require(agentRegistry.isAgentVerified(agentId), "Agent not verified");
 
-        _taskIds.increment();
-        uint256 newTaskId = _taskIds.current();
-
-        tasks[newTaskId] = Task({
+        taskCounter++;
+        tasks[taskCounter] = Task({
             agentId: agentId,
-            requester: msg.sender,
-            input: input,
-            output: "",
-            isVerified: false,
-            timestamp: block.timestamp,
-            status: TaskStatus.Pending
+            description: description,
+            status: TaskStatus.Created,
+            startTime: block.timestamp,
+            completionTime: 0,
+            result: ""
         });
 
-        agentTasks[agentId].push(newTaskId);
-
-        emit TaskCreated(newTaskId, agentId);
-        return newTaskId;
+        emit TaskCreated(taskCounter, agentId);
+        return taskCounter;
     }
 
-    function completeTask(uint256 taskId, string memory output) external {
+    function completeTask(
+        uint256 taskId,
+        bytes memory result
+    ) external nonReentrant {
         Task storage task = tasks[taskId];
-        require(task.timestamp != 0, "Task does not exist");
+        require(task.startTime != 0, "Task does not exist");
         require(
-            registry.getAgentController(task.agentId) == msg.sender,
-            "Not agent controller"
+            agentRegistry.getAgentController(task.agentId) == msg.sender,
+            "Not authorized"
         );
 
-        task.output = output;
         task.status = TaskStatus.Completed;
-        emit TaskCompleted(taskId);
+        task.completionTime = block.timestamp;
+        task.result = result;
+
+        emit TaskCompleted(taskId, result);
     }
 
-    function verifyTask(uint256 taskId) external onlyOwner {
-        require(tasks[taskId].timestamp != 0, "Task does not exist");
-        require(!tasks[taskId].isVerified, "Task already verified");
+    function failTask(uint256 taskId) external nonReentrant {
+        Task storage task = tasks[taskId];
+        require(task.startTime != 0, "Task does not exist");
+        require(
+            agentRegistry.getAgentController(task.agentId) == msg.sender,
+            "Not authorized"
+        );
 
-        tasks[taskId].isVerified = true;
-        emit TaskVerified(taskId);
+        task.status = TaskStatus.Failed;
+        task.completionTime = block.timestamp;
+
+        emit TaskFailed(taskId);
     }
 }
