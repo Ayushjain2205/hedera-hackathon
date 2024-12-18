@@ -43,7 +43,7 @@ const mockAgentData = {
     "Pattern Recognition",
   ],
   endpoint: "https://api.agent001.com",
-  agentId: "did:kyagent:hedera:agent001",
+  agentId: "did:kyagent:mantle:agent001",
   createdAt: "2023-06-15T10:30:00Z",
   status: "Active",
   performanceMetrics: {
