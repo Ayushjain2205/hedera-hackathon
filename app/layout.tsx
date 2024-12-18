@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ThirdwebProvider } from "thirdweb/react";
 
 import "./globals.css";
 
@@ -22,7 +23,9 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body>{children}</body>
+      <ThirdwebProvider>
+        <body>{children}</body>
+      </ThirdwebProvider>
     </html>
   );
 }

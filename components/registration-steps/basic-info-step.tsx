@@ -36,7 +36,7 @@ export function BasicInfoStep({ form }) {
           <FormItem>
             <FormLabel>Agent Name</FormLabel>
             <FormControl>
-              <Input placeholder="myagent" {...field} />
+              <Input {...field} />
             </FormControl>
             <FormDescription>
               3-30 characters, alphanumeric and hyphens only. ".agent" will be
@@ -53,11 +53,10 @@ export function BasicInfoStep({ form }) {
           <FormItem>
             <FormLabel>Controller Wallet</FormLabel>
             <FormControl>
-              <Input placeholder="Enter wallet address" {...field} />
+              <Input {...field} />
             </FormControl>
             <FormDescription>
-              Enter the Hedera account ID or public key of the controlling
-              wallet
+              Enter the Mantle account address of the controlling wallet
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -70,7 +69,7 @@ export function BasicInfoStep({ form }) {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea placeholder="Describe your agent..." {...field} />
+              <Textarea {...field} />
             </FormControl>
             <FormDescription>Maximum 500 characters</FormDescription>
             <FormMessage />

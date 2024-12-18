@@ -4,6 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { client } from "@/lib/client";
+import { ConnectButton } from "thirdweb/react";
+import { mantleSepolia } from "thirdweb/chains";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -35,12 +38,7 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
-          <Button
-            variant="outline"
-            className="ml-4 text-blue-600 border-blue-600 hover:bg-blue-50"
-          >
-            Connect Wallet
-          </Button>
+          <ConnectButton client={client} chain={mantleSepolia} theme="light" />
         </div>
       </div>
     </nav>

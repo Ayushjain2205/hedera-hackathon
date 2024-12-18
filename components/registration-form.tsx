@@ -26,17 +26,11 @@ const formSchema = z.object({
   }),
   technical: z.object({
     endpoint: z.string().url(),
-    auth: z.object({
-      type: z.enum(["apiKey", "bearer", "oauth"]),
-      config: z.any(),
-    }),
-    rateLimit: z.number().min(1),
-    timeout: z.number().min(1000).max(60000),
+    apiOutput: z.string(),
   }),
   verification: z.object({
-    testConfig: z.any(),
-    testResult: z.any(),
-    openApiSpec: z.any(),
+    apiOutput: z.string(),
+    isVerified: z.boolean().optional(),
   }),
   did: z.object({
     identifier: z.string(),
@@ -45,7 +39,7 @@ const formSchema = z.object({
   }),
 });
 
-export type RegistrationFormValues = z.infer<typeof formSchema>;
+type RegistrationFormValues = z.infer<typeof formSchema>;
 
 const steps = [
   { title: "Basic Information", description: "Agent details and capabilities" },
@@ -62,27 +56,21 @@ export function RegistrationForm() {
 
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(formSchema),
-    mode: "onSubmit",
     defaultValues: {
       basicInfo: {
-        name: "",
-        wallet: "",
-        description: "",
-        capabilities: [],
+        name: "MyAgent",
+        wallet: "0x1234567890123456789012345678901234567890",
+        description:
+          "A versatile AI agent capable of natural language processing and data analysis.",
+        capabilities: ["Text Generation", "Data Processing"],
       },
       technical: {
-        endpoint: "",
-        auth: {
-          type: "apiKey",
-          config: {},
-        },
-        rateLimit: 60,
-        timeout: 30000,
+        endpoint: "https://kyaagent.netlify.app/Myagent001",
+        apiOutput: "",
       },
       verification: {
-        testConfig: {},
-        testResult: null,
-        openApiSpec: null,
+        apiOutput: "",
+        isVerified: false,
       },
       did: {
         identifier: "",
@@ -92,18 +80,22 @@ export function RegistrationForm() {
     },
   });
 
-  // Separate function for handling next step
-  const handleNextStep = () => {
-    console.log("Handling next step, current step:", currentStep);
+  const onSubmit = async (data: RegistrationFormValues) => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+    } else {
+      console.log(data);
+      // Here you would typically send the data to your backend
     }
   };
 
-  // Separate function for handling previous step
-  const handlePreviousStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  const handleNext = async () => {
+    const currentStepData = Object.keys(form.getValues())[
+      currentStep
+    ] as keyof RegistrationFormValues;
+    const isValid = await form.trigger(currentStepData);
+    if (isValid) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -112,7 +104,10 @@ export function RegistrationForm() {
       <CardContent className="pt-6">
         <Steps currentStep={currentStep} steps={steps} />
         <Form {...form}>
-          <form className="space-y-8 mt-8">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 mt-8"
+          >
             {currentStep === 0 && <BasicInfoStep form={form} />}
             {currentStep === 1 && <TechnicalConfigStep form={form} />}
             {currentStep === 2 && <ApiVerificationStep form={form} />}
@@ -122,14 +117,18 @@ export function RegistrationForm() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handlePreviousStep}
+                  onClick={() => setCurrentStep(currentStep - 1)}
                 >
                   Previous
                 </Button>
               )}
-              <Button type="button" onClick={handleNextStep}>
-                {currentStep === steps.length - 1 ? "Submit" : "Next"}
-              </Button>
+              {currentStep < steps.length - 1 ? (
+                <Button type="button" onClick={handleNext}>
+                  Next
+                </Button>
+              ) : (
+                <Button type="submit">Submit</Button>
+              )}
             </div>
           </form>
         </Form>

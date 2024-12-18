@@ -12,10 +12,23 @@ import { Button } from "@/components/ui/button";
 import { CopyBlock, dracula } from "react-code-blocks";
 import { CheckCircle, XCircle } from "lucide-react";
 
+const hardcodedApiOutput = JSON.stringify(
+  {
+    status: "success",
+    message:
+      "Successfully connected to https://kyaagent.netlify.app/Myagent001",
+    data: {
+      agentName: "MyAgent",
+      version: "1.0.0",
+      capabilities: ["text generation", "image analysis"],
+    },
+  },
+  null,
+  2
+);
+
 export function ApiVerificationStep({ form }) {
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
-
-  const apiOutput = form.watch("technical.apiOutput");
 
   const verifyApi = () => {
     // In a real scenario, you'd perform actual verification here
@@ -34,7 +47,7 @@ export function ApiVerificationStep({ form }) {
             <FormControl>
               <div className="rounded-md overflow-hidden">
                 <CopyBlock
-                  text={apiOutput || "// No API test result available"}
+                  text={hardcodedApiOutput}
                   language="json"
                   theme={dracula}
                   wrapLines

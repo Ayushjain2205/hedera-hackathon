@@ -10,12 +10,19 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bot, QrCode } from "lucide-react";
+import { Bot, QrCode, Hash } from "lucide-react";
+
+function generateAgentId(name: string) {
+  const randomString = Math.random().toString(36).substring(2, 10);
+  return `did:kyagent:mantle:${name.toLowerCase()}-${randomString}`;
+}
 
 export function DidCreationStep({ form }) {
   const { name, wallet, description, capabilities } = form.watch("basicInfo");
   const { endpoint } = form.watch("technical");
-  const agentId = form.watch("did.identifier") || "Not generated";
+  const agentId = generateAgentId(name || "unknown");
+  const transactionHash =
+    "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
 
   return (
     <div className="space-y-6">
@@ -81,13 +88,24 @@ export function DidCreationStep({ form }) {
             </div>
           </div>
         </CardContent>
-        <div className="bg-gray-100 p-4 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
-            <p className="font-medium">Agent ID:</p>
-            <p className="font-mono text-xs break-all">{agentId}</p>
-            <p>Created: {new Date().toLocaleDateString()}</p>
+        <div className="bg-gray-100 p-4 flex flex-col space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              <p className="font-medium">Agent ID:</p>
+              <p className="font-mono text-xs break-all">{agentId}</p>
+            </div>
+            <QrCode className="h-10 w-10 text-gray-400" />
           </div>
-          <QrCode className="h-10 w-10 text-gray-400" />
+          <div className="text-sm text-gray-600">
+            <p className="font-medium flex items-center">
+              <Hash className="h-4 w-4 mr-1" />
+              Transaction Hash:
+            </p>
+            <p className="font-mono text-xs break-all">{transactionHash}</p>
+          </div>
+          <p className="text-xs text-gray-500">
+            Created: {new Date().toLocaleDateString()}
+          </p>
         </div>
       </Card>
 
@@ -111,7 +129,7 @@ export function DidCreationStep({ form }) {
               </FormLabel>
               <FormDescription>
                 By checking this box, you agree to create your Agent ID on the
-                Hedera network.
+                Mantle network.
               </FormDescription>
             </div>
           </FormItem>
